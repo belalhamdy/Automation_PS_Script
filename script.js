@@ -1,14 +1,18 @@
-//const modelsDirectory = Folder.selectDialog("Select Models (Skins) Directory");
-//const mobilesDirectory = Folder.selectDialog("Select Mobiles (PSD) Directory");
-//const outputDirectory = Folder.selectDialog("Select Output Directory");
+const modelsDirectory = Folder.selectDialog("Select Models (Skins) Directory");
+const mobilesDirectory = Folder.selectDialog("Select Mobiles (PSD) Directory");
+const outputDirectory = Folder.selectDialog("Select Output Directory");
+const transparentFileName = "SV";
+const transparentLayerName = "transparent";
+const maskLayerName = "mask";
+const photoLayerName = "photo";
+const delimiter = "-";
 
-
-const modelsPath = "S:\\work\\armor\\Skins\\testSkins";
+/*const modelsPath = "S:\\work\\armor\\Skins\\testSkins";
 const mobilesPath = "S:\\work\\armor\\Skins\\mobiles";
 const outPath = "S:\\work\\armor\\Skins\\out";
 const modelsDirectory = new Folder(modelsPath);
 const mobilesDirectory = new Folder(mobilesPath);
-const outputDirectory = new Folder(outPath);
+const outputDirectory = new Folder(outPath);*/
 
 main();
 
@@ -19,17 +23,48 @@ function main() {
         for (var i = 0; i < mobileList.length; ++i) {
             if (mobileList[i] instanceof File && mobileList[i].hidden === false) {
                 var docRef = open(mobileList[i]);
-                var docName = docRef.name.replace(/\.[^\.]+$/, '');
+                var docName = docRef.name.replace(/\.[^.]+$/, '');
+
+                var f = new Folder(outputDirectory + "/" + docName);
+                if (!f.exists) {
+                    f.create();
+                } else {
+                    alert("Error + " + docName + " Exists");
+                    continue;
+                }
+
                 for (var j = 0; j < modelsList.length; ++j) {
                     if (modelsList[j] instanceof File && modelsList[j].hidden === false) {
-                        var saveName = docName + " - " + j;
-                        placeImage(modelsList[j]);
+                        var transparentLayer = docRef.artLayers.getByName(transparentLayerName);
+                        var maskLayer = docRef.artLayers.getByName(maskLayerName);
+                        var photoLayer = docRef.artLayers.getByName(photoLayerName);
+
+                        docRef.activeLayer = maskLayer;
+
+                        var skinName = placeImage(modelsList[j]);
+                        var saveName = docName + delimiter + skinName;
+                        var transparent = skinName.indexOf(transparentFileName) !== -1;
+
                         playAction('MobileSkins', 'CenterImage');
                         playAction('MobileSkins', 'CreateClippingMask');
-                        ExportPNG(saveName + " - A");
-                        playAction('MobileSkins', 'HidePhoto');
-                        ExportPNG(saveName + " - B");
-                        playAction('MobileSkins', 'ShowPhoto');
+
+                        // start transparent
+                        if (transparent) {
+                            maskLayer.opacity = 30;
+                            transparentLayer.visible = true;
+                            transparentLayer.opacity = 70;
+                        }
+
+                        ExportPNG(docName, saveName + delimiter + "V");
+                        photoLayer.visible = false;
+                        ExportPNG(docName, saveName + delimiter + "H");
+                        photoLayer.visible = true;
+
+                        // end transparent
+                        if (transparent) {
+                            maskLayer.opacity = 100;
+                            transparentLayer.visible = false;
+                        }
 
                         docRef.layers[0].remove();
                     }
@@ -40,14 +75,17 @@ function main() {
     }
 }
 
+// returns fit layer name
 function fitCurrentLayerToCanvas(keepAspect) {// keepAspect:Boolean - optional. Default to false
+
     var doc = app.activeDocument;
     var layer = doc.activeLayer;
+
     // do nothing if layer is background or locked
     if (layer.isBackgroundLayer || layer.allLocked || layer.pixelsLocked
         || layer.positionLocked || layer.transparentPixelsLocked) return;
     // do nothing if layer is not normal artLayer or Smart Object
-    if (layer.kind != LayerKind.NORMAL && layer.kind != LayerKind.SMARTOBJECT) return;
+    if (layer.kind !== LayerKind.NORMAL && layer.kind !== LayerKind.SMARTOBJECT) return;
     // store the ruler
     var defaultRulerUnits = app.preferences.rulerUnits;
     app.preferences.rulerUnits = Units.PIXELS;
@@ -60,31 +98,28 @@ function fitCurrentLayerToCanvas(keepAspect) {// keepAspect:Boolean - optional. 
 
     // move the layer so top left corner matches canvas top left corner
     layer.translate(new UnitValue(0 - layer.bounds[0].as('px'), 'px'), new UnitValue(0 - layer.bounds[1].as('px'), 'px'));
+    var newWidth, newHeight, resizePercent;
     if (!keepAspect) {
         // scale the layer to match canvas
         layer.resize((width / layerWidth) * 100, (height / layerHeight) * 100, AnchorPosition.TOPLEFT);
     } else if ((width < height)) {
-
-        var layerRatio = layerWidth / layerHeight;
-        var newHeight = height;
-        var newWidth = width;
-        var resizePercent = newHeight / layerHeight * 100;
+        newHeight = height;
+        resizePercent = newHeight / layerHeight * 100;
         app.activeDocument.activeLayer.resize(resizePercent, resizePercent, AnchorPosition.TOPLEFT);
 
     } else {
-        var layerRatio = layerWidth / layerHeight;
-        var newWidth = width;
-        var newHeight = height;
+        newWidth = width;
+        newHeight = height;
         if (newHeight >= height) {
             newWidth = width;
-            newHeight = height;
         }
-        var resizePercent = newWidth / layerWidth * 100;
+        resizePercent = newWidth / layerWidth * 100;
         app.activeDocument.activeLayer.resize(resizePercent, resizePercent, AnchorPosition.TOPLEFT);
     }
     // restore the ruler
     app.preferences.rulerUnits = defaultRulerUnits;
 
+    return layer.name;
 }
 
 function placeImage(sourceFile) {
@@ -98,7 +133,7 @@ function placeImage(sourceFile) {
     desc3.putEnumerated(idFTcs, idQCSt, idQcsa);
     executeAction(idPlc, desc3, DialogModes.NO);
 
-    fitCurrentLayerToCanvas();
+    return fitCurrentLayerToCanvas();
 }
 
 function playAction(actionSet, actionName) {
@@ -114,7 +149,7 @@ function playAction(actionSet, actionName) {
     executeAction(idPly, desc2, DialogModes.NO);
 }
 
-function ExportPNG(name) {
+function ExportPNG(internalFolder, name) {
     var i;
     // Confirm the document has already been saved and so has a path to use
     try {
@@ -137,7 +172,7 @@ function ExportPNG(name) {
     }
 
     if (!foundVisible) {
-        alert("No visible layers found. PNG export failed.")
+        alert("No visible layers found. PNG export failed.");
         return
     }
 
@@ -159,12 +194,11 @@ function ExportPNG(name) {
 
     // Set up PNG save options.;
     pngOptions = new PNGSaveOptions();
-    pngOptions.compression = 1;
+    pngOptions.compression = 5;
     pngOptions.interlaced = false;
 
     // Set up destination path.
-    //savePath = File(outputDirectory + "/" + originalDoc.name.replace(/\.[^\.]+$/, '.png'));
-    savePath = File(outputDirectory + "/" + name + ".png");
+    savePath = File(outputDirectory + "/" + internalFolder + "/" + name + ".png");
 
     // Save!
     newDoc.saveAs(savePath, pngOptions, false, Extension.LOWERCASE);
