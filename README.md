@@ -8,6 +8,7 @@
         * `photo` which holds your photo.
         * `mask` which holds your photo mask.
 * PhotoShop CC 2019 is recommended.
+* Masks in `900 * 1329 pixels`.
 
 # How to Run
 * Load the action set `MobileSkins.atn`.
