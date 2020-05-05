@@ -14,65 +14,84 @@ const modelsDirectory = new Folder(modelsPath);
 const mobilesDirectory = new Folder(mobilesPath);
 const outputDirectory = new Folder(outPath);*/
 
-main();
+if (checker()) main();
 
 function main() {
-    if (modelsDirectory !== null && mobilesDirectory !== null && outputDirectory !== null) {
-        const mobileList = mobilesDirectory.getFiles();
-        const modelsList = modelsDirectory.getFiles();
-        for (var i = 0; i < mobileList.length; ++i) {
-            if (mobileList[i] instanceof File && mobileList[i].hidden === false) {
-                var docRef = open(mobileList[i]);
-                var docName = docRef.name.replace(/\.[^.]+$/, '');
+    const mobileList = mobilesDirectory.getFiles();
+    const modelsList = modelsDirectory.getFiles();
+    for (var i = 0; i < mobileList.length; ++i) {
+        if (mobileList[i] instanceof File && mobileList[i].hidden === false) {
+            var docRef = open(mobileList[i]);
+            var docName = docRef.name.replace(/\.[^.]+$/, '');
 
-                var f = new Folder(outputDirectory + "/" + docName);
-                if (!f.exists) {
-                    f.create();
-                } else {
-                    alert("Error + " + docName + " Exists");
-                    continue;
-                }
-
-                for (var j = 0; j < modelsList.length; ++j) {
-                    if (modelsList[j] instanceof File && modelsList[j].hidden === false) {
-                        var transparentLayer = docRef.artLayers.getByName(transparentLayerName);
-                        var maskLayer = docRef.artLayers.getByName(maskLayerName);
-                        var photoLayer = docRef.artLayers.getByName(photoLayerName);
-
-                        docRef.activeLayer = maskLayer;
-
-                        var skinName = placeImage(modelsList[j]);
-                        var saveName = docName + delimiter + skinName;
-                        var transparent = skinName.indexOf(transparentFileName) !== -1;
-
-                        playAction('MobileSkins', 'CenterImage');
-                        playAction('MobileSkins', 'CreateClippingMask');
-
-                        // start transparent
-                        if (transparent) {
-                            maskLayer.opacity = 30;
-                            transparentLayer.visible = true;
-                            transparentLayer.opacity = 70;
-                        }
-
-                        ExportPNG(docName, saveName + delimiter + "V");
-                        photoLayer.visible = false;
-                        ExportPNG(docName, saveName + delimiter + "H");
-                        photoLayer.visible = true;
-
-                        // end transparent
-                        if (transparent) {
-                            maskLayer.opacity = 100;
-                            transparentLayer.visible = false;
-                        }
-
-                        docRef.layers[0].remove();
-                    }
-                }
-                docRef.close(SaveOptions.SAVECHANGES);
+            var f = new Folder(outputDirectory + "/" + docName);
+            if (!f.exists) {
+                f.create();
+            } else {
+                alert("Error + " + docName + " Exists");
+                continue;
             }
+
+            for (var j = 0; j < modelsList.length; ++j) {
+                if (modelsList[j] instanceof File && modelsList[j].hidden === false) {
+                    var transparentLayer = docRef.artLayers.getByName(transparentLayerName);
+                    var maskLayer = docRef.artLayers.getByName(maskLayerName);
+                    var photoLayer = docRef.artLayers.getByName(photoLayerName);
+
+                    docRef.activeLayer = maskLayer;
+
+                    var skinName = placeImage(modelsList[j]);
+                    var saveName = docName + delimiter + skinName;
+                    var transparent = skinName.indexOf(transparentFileName) !== -1;
+
+                    playAction('MobileSkins', 'CenterImage');
+                    playAction('MobileSkins', 'CreateClippingMask');
+
+                    // start transparent
+                    if (transparent) {
+                        maskLayer.opacity = 30;
+                        transparentLayer.visible = true;
+                        transparentLayer.opacity = 70;
+                    }
+
+                    ExportPNG(docName, saveName + delimiter + "V");
+                    photoLayer.visible = false;
+                    ExportPNG(docName, saveName + delimiter + "H");
+                    photoLayer.visible = true;
+
+                    // end transparent
+                    if (transparent) {
+                        maskLayer.opacity = 100;
+                        transparentLayer.visible = false;
+                    }
+
+                    docRef.layers[0].remove();
+                }
+            }
+            docRef.close(SaveOptions.SAVECHANGES);
         }
     }
+}
+
+function checker() {
+    if (mobilesDirectory === null || modelsDirectory === null || outputDirectory === null) return false;
+    const mobileList = mobilesDirectory.getFiles();
+    for (var i = 0; i < mobileList.length; ++i) {
+        if (mobileList[i] instanceof File && mobileList[i].hidden === false) {
+            var docRef = open(mobileList[i]);
+            var docName = docRef.name.replace(/\.[^.]+$/, '');
+            try {
+                docRef.artLayers.getByName(transparentLayerName);
+                docRef.artLayers.getByName(maskLayerName);
+                docRef.artLayers.getByName(photoLayerName);
+            } catch (e) {
+                alert("Please Check layer names in document " + docName);
+                return false;
+            }
+
+        }
+    }
+    return true;
 }
 
 // returns fit layer name
