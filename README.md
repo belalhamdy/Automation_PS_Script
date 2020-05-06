@@ -17,4 +17,11 @@
 
 # Notes
 * To run action `prepare_mask` make the current layer selection on the mask layer. 
-   * If `prepare_mask` doesn't work try: In PhotoShop -> `Edit - Keyboard Shortcuts - Layer - Rename` and make it's shortcut -> `F2`.
+
+# How to prepare PSD Files
+1. Make a document of size 1000 x 1000.
+2. Get the phone photo and you don't have to center it.
+3. Draw the outline boundary of the phone with smart shapes.
+4. Press `F2` to cut the background of the phone.
+5. Complete phone drawing.
+6. Press `F3` to prepare the document, save it and open another document to continue.
