@@ -12,4 +12,8 @@
 
 # How to Run
 * Load the action set `MobileSkins.atn`.
+* Load the styles `styles.asl`.
 * In PhotoShop -> `File - Scripts - Browse` and choose `script.js`.
+
+# Notes
+* To run action `prepare_mask` make the current layer selection on the mask layer. 
