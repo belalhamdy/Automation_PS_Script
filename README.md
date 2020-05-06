@@ -11,10 +11,10 @@
 * Masks in `900 x 1329 pixels`.
 
 # How to Run
-* Load the action set `MobileSkins.atn`.
-* Load the styles `styles.asl`.
-* In PhotoShop -> `File - Scripts - Browse` and choose `script.js`.
+1. Load the action set `MobileSkins.atn`.
+2. Load the styles `styles.asl`.
+3. In PhotoShop -> `File - Scripts - Browse` and choose `script.js`.
 
 # Notes
 * To run action `prepare_mask` make the current layer selection on the mask layer. 
-        * If `prepare_mask` doesn't work try: In PhotoShop -> `Edit - Keyboard Shortcuts - Layer - Rename` and make it's shortcut -> `F2`.
+   * If `prepare_mask` doesn't work try: In PhotoShop -> `Edit - Keyboard Shortcuts - Layer - Rename` and make it's shortcut -> `F2`.
