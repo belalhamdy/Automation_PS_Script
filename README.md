@@ -8,7 +8,7 @@
         * `photo` which holds your photo.
         * `mask` which holds your photo mask.
 * PhotoShop CC 2019 is recommended.
-* Masks in `900 * 1329 pixels`.
+* Masks in `900 x 1329 pixels`.
 
 # How to Run
 * Load the action set `MobileSkins.atn`.
@@ -17,3 +17,4 @@
 
 # Notes
 * To run action `prepare_mask` make the current layer selection on the mask layer. 
+        * If `prepare_mask` doesn't work try: In PhotoShop -> `Edit - Keyboard Shortcuts - Layer - Rename` and make it's shortcut -> `F2`.
