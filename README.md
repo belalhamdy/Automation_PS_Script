@@ -17,4 +17,4 @@
 
 # Notes
 * To run action `prepare_mask` make the current layer selection on the mask layer. 
-        * If `prepare_mask` doesn't work try: In PhotoShop -> `Edit - Keyboard Shortcuts - Layer - Rename` and make it's shortcut -> `F2`.
+   * If `prepare_mask` doesn't work try: In PhotoShop -> `Edit - Keyboard Shortcuts - Layer - Rename` and make it's shortcut -> `F2`.
