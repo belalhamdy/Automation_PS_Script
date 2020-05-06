@@ -26,3 +26,5 @@
 4. Press `F2` to cut the background of the phone.
 5. Complete phone drawing.
 6. Press `F3` to prepare the document, save it and open another document to continue.
+
+* Make sure before pressing `F2` or `F3` that the current layer is the mask layer.
