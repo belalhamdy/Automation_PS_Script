@@ -4,9 +4,10 @@
 
 # Prerequisites
 * Directory contains all your PSD Files.
-    * Each File contains two layers:
+    * Each File contains three layers:
         * `photo` which holds your photo.
         * `mask` which holds your photo mask.
+        * `transparent` which holds the transparent layer for `SV Skins`.
 * PhotoShop CC 2019 is recommended.
 * Masks in `900 x 1329 pixels`.
 
