@@ -213,7 +213,7 @@ function ExportPNG(internalFolder, name) {
 
     // Set up PNG save options.;
     pngOptions = new PNGSaveOptions();
-    pngOptions.compression = 5;
+    pngOptions.compression = 2;
     pngOptions.interlaced = false;
 
     // Set up destination path.
