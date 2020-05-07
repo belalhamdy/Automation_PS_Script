@@ -18,6 +18,7 @@
 
 # Notes
 * To run action `prepare_mask` make the current layer selection on the mask layer. 
+* To change all files to lowercase characters open `CMD` and change directory to the current folder path then type `for /f "Tokens=*" %f in ('dir /l/b/a-d') do (rename "%f" "%f")`.
 
 # How to prepare PSD Files
 1. Make a document of size 1000 x 1000.
