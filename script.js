@@ -2,7 +2,7 @@ const modelsDirectory = Folder.selectDialog("Select Models (Skins) Directory");
 const mobilesDirectory = Folder.selectDialog("Select Mobiles (PSD) Directory");
 const outputDirectory = Folder.selectDialog("Select Output Directory");
 const transparentFileName = "SV";
-const transparentLayerName = "transparent";
+const transparentLayerName = "transparant";
 const maskLayerName = "mask";
 const photoLayerName = "photo";
 const delimiter = "-";
@@ -200,9 +200,11 @@ function ExportPNG(internalFolder, name) {
 
     // Photoshop must have a visible layer selected to merge visible layers, so we ensure there is one selected.
     newDoc.activeLayer = newDoc.artLayers.add();
-
+    newDoc.activeLayer.visible = true;
+    
     // Merge the layers.
     newDoc.mergeVisibleLayers();
+
 
     // Remove all empty layers.
     for (i = newDoc.layers.length - 1; i >= 0; i--) {
