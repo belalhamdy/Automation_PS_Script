@@ -1,7 +1,7 @@
 const modelsDirectory = Folder.selectDialog("Select Models (Skins) Directory");
 const mobilesDirectory = Folder.selectDialog("Select Mobiles (PSD) Directory");
 const outputDirectory = Folder.selectDialog("Select Output Directory");
-const transparentFileName = "SV";
+const transparentFileName = "sv";
 const transparentLayerName = "transparant";
 const maskLayerName = "mask";
 const photoLayerName = "photo";
@@ -88,6 +88,7 @@ function checker() {
                 alert("Please Check layer names in document " + docName);
                 return false;
             }
+            docRef.close(SaveOptions.DONOTSAVECHANGES);
 
         }
     }
