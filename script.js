@@ -54,9 +54,9 @@ function main() {
                         transparentLayer.opacity = 70;
                     }
 
-                    ExportPNG(docName, saveName + delimiter + "V");
+                    ExportPNG(docName, saveName + delimiter + "v");
                     photoLayer.visible = false;
-                    ExportPNG(docName, saveName + delimiter + "H");
+                    ExportPNG(docName, saveName + delimiter + "h");
                     photoLayer.visible = true;
 
                     // end transparent
