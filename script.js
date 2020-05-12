@@ -14,8 +14,10 @@ const modelsDirectory = new Folder(modelsPath);
 const mobilesDirectory = new Folder(mobilesPath);
 const outputDirectory = new Folder(outPath);*/
 
+var totalTime = new TimeIt();
 if (checker()) main();
-
+totalTime.stop();
+alert(totalTime.getTime());
 function main() {
     const mobileList = mobilesDirectory.getFiles();
     const modelsList = modelsDirectory.getFiles();
@@ -46,19 +48,21 @@ function main() {
 
                     playAction('MobileSkins', 'CenterImage');
                     playAction('MobileSkins', 'CreateClippingMask');
-
+                     
                     // start transparent
                     if (transparent) {
-                        maskLayer.opacity = 30;
-                        transparentLayer.visible = true;
-                        transparentLayer.opacity = 70;
+                        maskLayer.opacity = 60;
+                        //transparentLayer.visible = true;
+                        //transparentLayer.opacity = 70;
                     }
 
                     ExportPNG(docName, saveName + delimiter + "v");
                     photoLayer.visible = false;
+                    
+                    playAction('MobileSkins', 'hideMaskLayerStyle');
                     ExportPNG(docName, saveName + delimiter + "h");
                     photoLayer.visible = true;
-
+                    playAction('MobileSkins', 'showMaskLayerStyle');
                     // end transparent
                     if (transparent) {
                         maskLayer.opacity = 100;
@@ -230,5 +234,48 @@ function ExportPNG(internalFolder, name) {
 
     // Just in case, make sure the active document is the orignal one.
     app.activeDocument = originalDoc
+}
+function TimeIt() {
+
+  // member variables
+
+  this.startTime = new Date();
+
+  this.endTime = new Date();
+
+  // member functions
+
+  // reset the start time to now
+
+  this.start = function () {
+
+        this.startTime = new Date();
+
+    }
+
+  // reset the end time to now
+
+  this.stop = function () {
+
+        this.endTime = new Date();
+
+    }
+
+  // get the difference in seconds between start and stop
+
+  this.getTime = function () {
+
+        return ((this.endTime.getTime() - this.startTime.getTime()) / (1000*100));
+
+    }
+
+  // get the current elapsed time from start to now, this sets the endTime
+
+  this.getElapsed = function () {
+
+        this.endTime = new Date(); return this.getTime();
+
+    }
+
 }
 
