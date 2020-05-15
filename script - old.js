@@ -7,6 +7,13 @@ const maskLayerName = "mask";
 const photoLayerName = "photo";
 const delimiter = "-";
 
+/*const modelsPath = "S:\\work\\armor\\Skins\\testSkins";
+const mobilesPath = "S:\\work\\armor\\Skins\\mobiles";
+const outPath = "S:\\work\\armor\\Skins\\out";
+const modelsDirectory = new Folder(modelsPath);
+const mobilesDirectory = new Folder(mobilesPath);
+const outputDirectory = new Folder(outPath);*/
+
 var totalTime = new TimeIt();
 if (checker()) main();
 totalTime.stop();
@@ -119,13 +126,12 @@ function fitCurrentLayerToCanvas(keepAspect) {// keepAspect:Boolean - optional. 
     if (!keepAspect) {
         // scale the layer to match canvas
         layer.resize((width / layerWidth) * 100, (height / layerHeight) * 100, AnchorPosition.TOPLEFT);
-    } else {
+    } else if ((width < height)) {
         newHeight = height;
         resizePercent = newHeight / layerHeight * 100;
         app.activeDocument.activeLayer.resize(resizePercent, resizePercent, AnchorPosition.TOPLEFT);
 
-    }/* else {
-        alert("HI2");
+    } else {
         newWidth = width;
         newHeight = height;
         if (newHeight >= height) {
@@ -133,14 +139,9 @@ function fitCurrentLayerToCanvas(keepAspect) {// keepAspect:Boolean - optional. 
         }
         resizePercent = newWidth / layerWidth * 100;
         app.activeDocument.activeLayer.resize(resizePercent, resizePercent, AnchorPosition.TOPLEFT);
-    }*/
-    // special image
-    if (layer.name.indexOf("se48") !== -1){
-        layer.translate(new UnitValue(100 - layer.bounds[0].as('px'), 'px'), new UnitValue(100 - layer.bounds[1].as('px'), 'px'));
     }
     // restore the ruler
     app.preferences.rulerUnits = defaultRulerUnits;
-    
 
     return layer.name;
 }
@@ -156,7 +157,7 @@ function placeImage(sourceFile) {
     desc3.putEnumerated(idFTcs, idQCSt, idQcsa);
     executeAction(idPlc, desc3, DialogModes.NO);
 
-    return fitCurrentLayerToCanvas(true);
+    return fitCurrentLayerToCanvas();
 }
 
 function playAction(actionSet, actionName) {
@@ -277,4 +278,3 @@ function TimeIt() {
     }
 
 }
-
