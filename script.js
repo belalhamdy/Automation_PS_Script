@@ -134,10 +134,10 @@ function fitCurrentLayerToCanvas(keepAspect) {// keepAspect:Boolean - optional. 
         resizePercent = newWidth / layerWidth * 100;
         app.activeDocument.activeLayer.resize(resizePercent, resizePercent, AnchorPosition.TOPLEFT);
     }*/
-    // special image
+    /*// special image
     if (layer.name.indexOf("se48") !== -1){
         layer.translate(new UnitValue(100 - layer.bounds[0].as('px'), 'px'), new UnitValue(100 - layer.bounds[1].as('px'), 'px'));
-    }
+    }*/
     // restore the ruler
     app.preferences.rulerUnits = defaultRulerUnits;
     
