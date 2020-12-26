@@ -8,7 +8,8 @@ const photoLayerName = "photo";
 const delimiter = "-";
 
 var totalTime = new TimeIt();
-if (checker()) main();
+if (checker())
+	main();
 totalTime.stop();
 alert(totalTime.getTime());
 function main() {
@@ -49,11 +50,11 @@ function main() {
                         //transparentLayer.opacity = 70;
                     }
 
-                    ExportPNG(docName, saveName + delimiter + "v");
+                    save(docName, saveName + delimiter + "v");
                     photoLayer.visible = false;
                     
                     playAction('MobileSkins', 'hideMaskLayerStyle');
-                    ExportPNG(docName, saveName + delimiter + "h");
+                    save(docName, saveName + delimiter + "h");
                     photoLayer.visible = true;
                     playAction('MobileSkins', 'showMaskLayerStyle');
                     // end transparent
@@ -70,6 +71,10 @@ function main() {
     }
 }
 
+function save(internalFolder, name){
+	
+	ExportJPG(internalFolder, name);
+}
 function checker() {
     if (mobilesDirectory === null || modelsDirectory === null || outputDirectory === null) return false;
     const mobileList = mobilesDirectory.getFiles();
@@ -278,3 +283,70 @@ function TimeIt() {
 
 }
 
+function ExportJPG(internalFolder, name){
+	 var i;
+    // Confirm the document has already been saved and so has a path to use
+    try {
+        app.activeDocument.save()
+    } catch (e) {
+        alert("Could not export JPG as the document is not saved.\nPlease save and try again.");
+        return
+    }
+
+    // Store the active doc handle in variable
+    const originalDoc = app.activeDocument;
+
+    // Check there is at least 1 visible layer.
+    var foundVisible = false;
+    for (i = 0; i < originalDoc.layers.length; i++) {
+        if (originalDoc.layers[i].visible) {
+            foundVisible = true;
+            break
+        }
+    }
+
+    if (!foundVisible) {
+        alert("No visible layers found. JPG export failed.");
+        return
+    }
+
+    // Duplicate. We'll save the duplicate as a .png and close it.
+    const newDoc = originalDoc.duplicate();
+
+    // Photoshop must have a visible layer selected to merge visible layers, so we ensure there is one selected.
+    newDoc.activeLayer = newDoc.artLayers.add();
+    newDoc.activeLayer.visible = true;
+    
+    // Merge the layers.
+    newDoc.mergeVisibleLayers();
+
+
+    // Remove all empty layers.
+    for (i = newDoc.layers.length - 1; i >= 0; i--) {
+        if (!newDoc.layers[i].visible) {
+            newDoc.layers[i].remove()
+        }
+    }
+
+	var jpgOptions = new JPEGSaveOptions();
+	jpgOptions.quality = 12;
+	jpgOptions.embedColorProfile = true;
+	jpgOptions.formatOptions = FormatOptions.PROGRESSIVE;
+	if(jpgOptions.formatOptions == FormatOptions.PROGRESSIVE){
+	jpgOptions.scans = 5;
+	}
+	jpgOptions.matte = MatteType.NONE;
+	
+    // Set up destination path.
+    savePath = File(outputDirectory + "/" + internalFolder + "/" + name + ".jpg");
+
+    // Save!
+    newDoc.saveAs(savePath, jpgOptions, false, Extension.LOWERCASE);
+
+    // Close the duplicate.
+    newDoc.close();
+
+    // Just in case, make sure the active document is the orignal one.
+    app.activeDocument = originalDoc
+	
+}
