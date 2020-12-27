@@ -97,6 +97,31 @@ function checker() {
     return true;
 }
 
+function fitCurrentLayerToMobileSize(){
+	var doc = app.activeDocument;
+    var layer = doc.activeLayer;
+	    // do nothing if layer is background or locked
+    if (layer.isBackgroundLayer || layer.allLocked || layer.pixelsLocked
+        || layer.positionLocked || layer.transparentPixelsLocked) return;
+    // do nothing if layer is not normal artLayer or Smart Object
+    if (layer.kind !== LayerKind.NORMAL && layer.kind !== LayerKind.SMARTOBJECT) return;
+    // store the ruler
+    var defaultRulerUnits = app.preferences.rulerUnits;
+    app.preferences.rulerUnits = Units.PIXELS;
+	
+    var bounds = app.activeDocument.activeLayer.bounds;
+    var layerWidth = bounds[2].as('px') - bounds[0].as('px');
+    var layerHeight = bounds[3].as('px') - bounds[1].as('px');
+	
+	newHeight = 720; // here goes the required skin height
+    resizePercent = newHeight / layerHeight * 100;
+    app.activeDocument.activeLayer.resize(resizePercent, resizePercent, AnchorPosition.TOPLEFT);
+	
+	
+	app.preferences.rulerUnits = defaultRulerUnits;
+
+	return layer.name;
+}
 // returns fit layer name
 function fitCurrentLayerToCanvas(keepAspect) {// keepAspect:Boolean - optional. Default to false
 
@@ -161,7 +186,7 @@ function placeImage(sourceFile) {
     desc3.putEnumerated(idFTcs, idQCSt, idQcsa);
     executeAction(idPlc, desc3, DialogModes.NO);
 
-    return fitCurrentLayerToCanvas(true);
+    return fitCurrentLayerToMobileSize();
 }
 
 function playAction(actionSet, actionName) {
