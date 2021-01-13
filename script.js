@@ -1,7 +1,7 @@
 const modelsDirectory = Folder.selectDialog("Select Models (Skins) Directory");
 const mobilesDirectory = Folder.selectDialog("Select Mobiles (PSD) Directory");
 const outputDirectory = Folder.selectDialog("Select Output Directory");
-const transparentFileName = "sv";
+const transparentFileName = "sv".toLowerCase();
 const transparentLayerName = "transparant";
 const maskLayerName = "mask";
 const photoLayerName = "photo";
@@ -38,7 +38,7 @@ function main() {
 
                     var skinName = placeImage(modelsList[j]);
                     var saveName = docName + delimiter + skinName;
-                    var transparent = skinName.indexOf(transparentFileName) !== -1;
+                    var transparent = skinName.toLowerCase().indexOf(transparentFileName) !== -1;
 
                     playAction('MobileSkins', 'CenterImage');
                     playAction('MobileSkins', 'CreateClippingMask');
@@ -354,7 +354,7 @@ function ExportJPG(internalFolder, name){
     }
 
 	var jpgOptions = new JPEGSaveOptions();
-	jpgOptions.quality = 12;
+	jpgOptions.quality = 8;
 	jpgOptions.embedColorProfile = true;
 	jpgOptions.formatOptions = FormatOptions.PROGRESSIVE;
 	if(jpgOptions.formatOptions == FormatOptions.PROGRESSIVE){
