@@ -1,17 +1,26 @@
-const modelsDirectory = Folder.selectDialog("Select Models (Skins) Directory");
-const mobilesDirectory = Folder.selectDialog("Select Mobiles (PSD) Directory");
-const outputDirectory = Folder.selectDialog("Select Output Directory");
+const batchId = "6";
+const modelsPath = "S:\\work\\armor\\Skins\\all";
+const mobilesPath = "S:\\work\\armor\\Skins\\mobiles\\Batch " + batchId;
+const outPath = "S:\\work\\armor\\Skins\\out\\Batch " + batchId;
+
 const transparentFileName = "sv".toLowerCase();
 const transparentLayerName = "transparant";
 const maskLayerName = "mask";
 const photoLayerName = "photo";
 const delimiter = "-";
 
-var totalTime = new TimeIt();
-if (checker())
+const modelsDirectory = new Folder(modelsPath);
+const mobilesDirectory = new Folder(mobilesPath);
+const outputDirectory = new Folder(outPath);
+
+
+
+if (checker()){
+	var totalTime = new TimeIt();
 	main();
-totalTime.stop();
-alert(totalTime.getTime());
+alert(totalTime.getElapsed() + "Hours");
+}
+
 function main() {
     const mobileList = mobilesDirectory.getFiles();
     const modelsList = modelsDirectory.getFiles();
@@ -46,8 +55,6 @@ function main() {
                     // start transparent
                     if (transparent) {
                         maskLayer.opacity = 60;
-                        //transparentLayer.visible = true;
-                        //transparentLayer.opacity = 70;
                     }
 
                     save(docName, saveName + delimiter + "v");
@@ -57,6 +64,7 @@ function main() {
                     save(docName, saveName + delimiter + "h");
                     photoLayer.visible = true;
                     playAction('MobileSkins', 'showMaskLayerStyle');
+					
                     // end transparent
                     if (transparent) {
                         maskLayer.opacity = 100;
@@ -66,13 +74,12 @@ function main() {
                     docRef.layers[0].remove();
                 }
             }
-            docRef.close(SaveOptions.SAVECHANGES);
+            docRef.close(SaveOptions.DONOTSAVECHANGES);
         }
     }
 }
 
 function save(internalFolder, name){
-	
 	ExportJPG(internalFolder, name);
 }
 function checker() {
@@ -122,59 +129,6 @@ function fitCurrentLayerToMobileSize(){
 
 	return layer.name;
 }
-// returns fit layer name
-function fitCurrentLayerToCanvas(keepAspect) {// keepAspect:Boolean - optional. Default to false
-
-    var doc = app.activeDocument;
-    var layer = doc.activeLayer;
-
-    // do nothing if layer is background or locked
-    if (layer.isBackgroundLayer || layer.allLocked || layer.pixelsLocked
-        || layer.positionLocked || layer.transparentPixelsLocked) return;
-    // do nothing if layer is not normal artLayer or Smart Object
-    if (layer.kind !== LayerKind.NORMAL && layer.kind !== LayerKind.SMARTOBJECT) return;
-    // store the ruler
-    var defaultRulerUnits = app.preferences.rulerUnits;
-    app.preferences.rulerUnits = Units.PIXELS;
-
-    var width = doc.width.as('px');
-    var height = doc.height.as('px');
-    var bounds = app.activeDocument.activeLayer.bounds;
-    var layerWidth = bounds[2].as('px') - bounds[0].as('px');
-    var layerHeight = bounds[3].as('px') - bounds[1].as('px');
-
-    // move the layer so top left corner matches canvas top left corner
-    layer.translate(new UnitValue(0 - layer.bounds[0].as('px'), 'px'), new UnitValue(0 - layer.bounds[1].as('px'), 'px'));
-    var newWidth, newHeight, resizePercent;
-    if (!keepAspect) {
-        // scale the layer to match canvas
-        layer.resize((width / layerWidth) * 100, (height / layerHeight) * 100, AnchorPosition.TOPLEFT);
-    } else {
-        newHeight = height;
-        resizePercent = newHeight / layerHeight * 100;
-        app.activeDocument.activeLayer.resize(resizePercent, resizePercent, AnchorPosition.TOPLEFT);
-
-    }/* else {
-        alert("HI2");
-        newWidth = width;
-        newHeight = height;
-        if (newHeight >= height) {
-            newWidth = width;
-        }
-        resizePercent = newWidth / layerWidth * 100;
-        app.activeDocument.activeLayer.resize(resizePercent, resizePercent, AnchorPosition.TOPLEFT);
-    }*/
-    /*// special image
-    if (layer.name.indexOf("se48") !== -1){
-        layer.translate(new UnitValue(100 - layer.bounds[0].as('px'), 'px'), new UnitValue(100 - layer.bounds[1].as('px'), 'px'));
-    }*/
-    // restore the ruler
-    app.preferences.rulerUnits = defaultRulerUnits;
-    
-
-    return layer.name;
-}
-
 function placeImage(sourceFile) {
     const idPlc = charIDToTypeID("Plc ");
     const desc3 = new ActionDescriptor();
@@ -202,103 +156,26 @@ function playAction(actionSet, actionName) {
     executeAction(idPly, desc2, DialogModes.NO);
 }
 
-function ExportPNG(internalFolder, name) {
-    var i;
-    // Confirm the document has already been saved and so has a path to use
-    try {
-        app.activeDocument.save()
-    } catch (e) {
-        alert("Could not export PNG as the document is not saved.\nPlease save and try again.");
-        return
-    }
-
-    // Store the active doc handle in variable
-    const originalDoc = app.activeDocument;
-
-    // Check there is at least 1 visible layer.
-    var foundVisible = false;
-    for (i = 0; i < originalDoc.layers.length; i++) {
-        if (originalDoc.layers[i].visible) {
-            foundVisible = true;
-            break
-        }
-    }
-
-    if (!foundVisible) {
-        alert("No visible layers found. PNG export failed.");
-        return
-    }
-
-    // Duplicate. We'll save the duplicate as a .png and close it.
-    const newDoc = originalDoc.duplicate();
-
-    // Photoshop must have a visible layer selected to merge visible layers, so we ensure there is one selected.
-    newDoc.activeLayer = newDoc.artLayers.add();
-    newDoc.activeLayer.visible = true;
-    
-    // Merge the layers.
-    newDoc.mergeVisibleLayers();
-
-
-    // Remove all empty layers.
-    for (i = newDoc.layers.length - 1; i >= 0; i--) {
-        if (!newDoc.layers[i].visible) {
-            newDoc.layers[i].remove()
-        }
-    }
-
-    // Set up PNG save options.;
-    pngOptions = new PNGSaveOptions();
-    pngOptions.compression = 2;
-    pngOptions.interlaced = false;
-
-    // Set up destination path.
-    savePath = File(outputDirectory + "/" + internalFolder + "/" + name + ".png");
-
-    // Save!
-    newDoc.saveAs(savePath, pngOptions, false, Extension.LOWERCASE);
-
-    // Close the duplicate.
-    newDoc.close();
-
-    // Just in case, make sure the active document is the orignal one.
-    app.activeDocument = originalDoc
-}
 function TimeIt() {
-
-  // member variables
-
   this.startTime = new Date();
-
   this.endTime = new Date();
-
-  // member functions
-
-  // reset the start time to now
 
   this.start = function () {
 
         this.startTime = new Date();
 
     }
-
-  // reset the end time to now
-
+	
   this.stop = function () {
 
         this.endTime = new Date();
 
     }
-
-  // get the difference in seconds between start and stop
-
   this.getTime = function () {
 
-        return ((this.endTime.getTime() - this.startTime.getTime()) / (1000*100));
+        return ((this.endTime.getTime() - this.startTime.getTime()) / (1000*60*60));
 
     }
-
-  // get the current elapsed time from start to now, this sets the endTime
 
   this.getElapsed = function () {
 
