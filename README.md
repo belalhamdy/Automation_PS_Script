@@ -32,7 +32,7 @@
 
 # Sample
 ## Mask Image
-![](images/mask.png)
+![](images/mobile.jpg)
 ## Generated Skin
-![](images/skin.png)
+![](images/skin.jpg)
 
